@@ -45,6 +45,8 @@ This mode ensures the entirety of the message will be played out before any user
         ), cancellationToken);
 ```
 
+_Note:_ Disabeling only DTMF or only speech barge-in is not yet fully functional. The support for these barge-in modes is expected  to land in early March 2021
+
 ### Example 2: Disable Just DTMF Barge-In
 ```csharp
     private string SimpleConvertToSSML(string text, string voiceId, string locale)
@@ -93,6 +95,7 @@ This mode ensures the entirety of the message will be played out before any user
         ), cancellationToken);
 ```
 _Note:_ In the Public Preview release, the botframework SDK does not yet contain all InputHints contstants (InputHints.IgnoringSpeechInput, InputHints.IgnoringNonSpeechInput). Until support is added in the SDK, please use the strings listed in the "Experimental InputHint Additions" section.
+
 
 ## DTMF input
 
