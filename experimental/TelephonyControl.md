@@ -1,6 +1,99 @@
 # Controlling Telephony and speech specific behavior
 To allow speech specific functionality, the botframework SDK has extended existing APIs and implemented a new one for recording.
 
+## Disable barge-in
+Barge-in, also called "allow interrupt", is the ability of a system to allow callers to interrupt or barge-in during voice playback by speaking or pressing a numpad key (DTMF). Telephony channel enables both forms of barge-in (speech and DTMF) by default. On barge-in, the current bot message will be stopped and any queued bot messages will be dequeued. 
+
+Sometimes it is necessary though, due to legal or compliance requirements, to disallow barge-in on a per message basis. Telephony channel allows barge-in to be disabled for just speech barge-in, just DTMF barge-in or disabled for both.
+
+To disable barge-in (either for speech barge-in, DTMF barge-in, or both), the activity must have an input hint value. The barge-in mode will only affect the message it is applied to, not any subsequent messages. As stated before, both speech and DTMF barge-in are enabled by default so no inputHint is needed for that case. Below are examples on how to disable only speech, only dtmf, or both forms of barge-in:
+
+### Experimental InputHint Additions
+```csharp
+    public static class InputHints
+    {
+        public const string AcceptingInput = "acceptingInput";
+        public const string IgnoringInput = "ignoringInput";
+        public const string IgnoringNonSpeechInput = "ignoringNonSpeechInput";
+        public const string IgnoringSpeechInput = "ignoringSpeechInput";
+        public const string ExpectingInput = "expectingInput";
+    }
+```
+
+### Example 1: Disable Both Speech and DTMF Barge-In
+This mode ensures the entirety of the message will be played out before any user action can be taken.
+```csharp
+    private string SimpleConvertToSSML(string text, string voiceId, string locale)
+    {
+        string ssmlTemplate = @"
+        <speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='{2}'>
+            <voice name='{1}'> {0} </voice>
+        </speak>";
+
+        return string.Format(ssmlTemplate, text, voiceId, locale);
+    }
+
+    var replyText = "The barge-in mode for this message is none, both speech and dtmf barge-in are disabled"
+    await turnContext.SendActivityAsync(
+        MessageFactory.Text(
+            replyText,
+            SimpleConvertToSSML(
+                replyText,
+                "Microsoft Server Speech Text to Speech Voice (en-US, JessaRUS)",
+                "en-US"),
+            InputHints.IgnoringInput
+        ), cancellationToken);
+```
+
+### Example 2: Disable Just DTMF Barge-In
+```csharp
+    private string SimpleConvertToSSML(string text, string voiceId, string locale)
+    {
+        string ssmlTemplate = @"
+        <speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='{2}'>
+            <voice name='{1}'> {0} </voice>
+        </speak>";
+
+        return string.Format(ssmlTemplate, text, voiceId, locale);
+    }
+
+    var replyText = "The barge-in mode for this message is speech only, only dtmf barge-in is disabled"
+    await turnContext.SendActivityAsync(
+        MessageFactory.Text(
+            replyText,
+            SimpleConvertToSSML(
+                replyText,
+                "Microsoft Server Speech Text to Speech Voice (en-US, JessaRUS)",
+                "en-US"),
+            InputHints.IgnoringNonSpeechInput
+        ), cancellationToken);
+```
+
+### Example 3: Disable Just Speech Barge-In
+```csharp
+    private string SimpleConvertToSSML(string text, string voiceId, string locale)
+    {
+        string ssmlTemplate = @"
+        <speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='{2}'>
+            <voice name='{1}'> {0} </voice>
+        </speak>";
+
+        return string.Format(ssmlTemplate, text, voiceId, locale);
+    }
+
+    var replyText = "The barge-in mode for this message is dtmf only, only speech barge-in is disabled"
+    await turnContext.SendActivityAsync(
+        MessageFactory.Text(
+            replyText,
+            SimpleConvertToSSML(
+                replyText,
+                "Microsoft Server Speech Text to Speech Voice (en-US, JessaRUS)",
+                "en-US"),
+            InputHints.IgnoringSpeechInput
+        ), cancellationToken);
+```
+_Note:_ In the Public Preview release, the botframework SDK does not yet contain all InputHints contstants (InputHints.IgnoringSpeechInput, InputHints.IgnoringNonSpeechInput). Until support is added in the SDK, please use the strings listed in the "Experimental InputHint Additions" section.
+
 ## DTMF input
 
 DTMF input is passed to the bot in the `Text` field of the activity object. Possible DTMF characters are digits from `0` to `9`, `*` (star) and `#` (pound). DTMF input is not localized.

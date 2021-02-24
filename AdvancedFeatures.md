@@ -7,4 +7,3 @@ While many bots can be Telephony-enabled by the steps above, you can build more 
 * [Terminating a call](TerminateCall.md)
 * [DTMF detection](DTMF.md)
 * [Troubleshooting](TroubleshootingTelephonyBot.md)
-* [Barge-in](BargeIn.md) (also known as *allow-interrupt*)
